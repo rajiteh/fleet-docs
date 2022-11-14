@@ -91,6 +91,16 @@ helm:
   # All labels on Rancher clusters are available using global.fleet.clusterLabels.LABELNAME
   # These can now be accessed directly as variables
     variableName: global.fleet.clusterLabels.LABELNAME
+  # It is possible to specify the keys and values as gotpl strings for advanced templating needs.
+  # Most of the functions from sprig templating library is available.
+  # The template context has following keys.
+  # `.Values` are retrieved from cluster's `spec.templateContext`
+  # `.ClusterLabels` and `.ClusterAnnotations` are the labels and annoations in the cluster resource.
+  # `.ClusterName` as the fleet's cluster resource name.
+  # `.ClusterNamespace` as the namespace which the cluster resource exists.
+    templatedLabel: "{{ .ClusterLabels.LABELNAME }}-foo"
+    configForEnv:
+      "{{ .ClusterLabels.ENV }}": "{{ .Values.someValue | upper }}"
   # Path to any values files that need to be passed to helm during install
   valuesFiles:
     - values1.yaml
@@ -110,6 +120,8 @@ helm:
   force: false
   # Set the Helm --atomic flag when upgrading
   atomic: false
+  # Disable go template pre-processing on the fleet values
+  disablePreprocess: false
 
 # A paused bundle will not update downstream clusters but instead mark the bundle
 # as OutOfSync. One can then manually confirm that a bundle should be deployed to
